@@ -18,10 +18,16 @@
 
 이 리포는 *함수 자리의 정의*만 둔다. 구현은 *통증이 누적된 후* 명세한다 (deflationary).
 
-후보 카테고리 (commitment 아님):
+### SKILL — 방법론 자리
+
+규율 측 SKILL은 [`skills/`](skills/)에 거주. 도구가 아닌 *protocol 명시*. 첫 SKILL:
+
+- [`skills/requery/SKILL.md`](skills/requery/SKILL.md) — **반복 쿼리 재구성** (agentic retrieval cycle). Letta filesystem 결(LoCoMo 74% > Mem0 graph 68.5%) 적용. 6단계 protocol + 휴리스틱 4종(동의어·시점·추상↔구체·결) + 손맛 vs 더듬이 경계
+
+### 후보 카테고리 (commitment 아님)
+
 - 정형 인덱스 강화 — frontmatter·인덱스·cross-link `[[name]]`
 - 반정형 thread/heading 표준화
-- **반복 쿼리 재구성 protocol** — agentic retrieval cycle (Letta filesystem 결: LoCoMo 74% > Mem0 graph 68.5%)
 - hybrid index (BM25 + semantic + RRF; semble_rs 결) — *통증 누적 전 도구화 금지*
 - graph traversal (ADR supersedes·`[[name]]` lineage)
 
