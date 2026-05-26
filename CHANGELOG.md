@@ -2,13 +2,19 @@
 
 All notable changes to deodeumi. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
-**Versioning policy**: SemVer tag held back until external fork·breaking change·sustained API surface triggers it. Until then, changes accumulate under *Unreleased*.
+**Versioning policy**: SemVer 태그는 *기록·마일스톤* 목적으로 단다 — 외부 사용자/트리거를 기다리지 않는다 (2026-05-26 stance 정정: sonmat도 사용자가 아닌 plugin 메커니즘·기록으로 태깅을 시작했다). 0.x는 API 안정 전 baseline 스냅샷. SHA 단위는 `git log`, 사람이 읽는 요약은 이 파일.
 
 **Scope**: substrate retrieval + path orchestration 함수의 *공통 자리* 정의. 채택 instance의 구현 사연(우리 사용자의 v0 practice·자제선)은 이 리포 밖 — instance README가 가리키는 자리.
 
 ---
 
 ## [Unreleased]
+
+_(다음 변경 누적)_
+
+## [0.1.0] - 2026-05-26
+
+첫 SemVer baseline — 기록·마일스톤 도장. requery SKILL(agentic retrieval cycle 6단계)과 retrieval+orchestration 함수 자리 정의가 표면. 구현 강제 아닌 protocol 명시 단계.
 
 ### Added (2026-05-14)
 - `skills/requery/SKILL.md` — 첫 SKILL. agentic retrieval cycle (반복 쿼리 재구성) 6단계 protocol + 휴리스틱 4종(동의어·시점·추상↔구체·결) + 3-tier 데이터(정형/반정형/비정형) retrieval 매핑 + 손맛 vs 더듬이 경계 절. Letta filesystem 결(LoCoMo 74% > Mem0 graph 68.5%) 적용. 도구가 아닌 protocol 명시 (plugin 미등록 — 통증 누적 시 plugin화 검토)
