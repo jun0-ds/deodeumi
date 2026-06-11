@@ -41,6 +41,7 @@ deodeumi는 *함수 자리*. 채택하는 instance(개인 안채·팀 substrate�
 
 - [`jun0-ds/munteok`](https://github.com/jun0-ds/munteok) — 문턱(munteok) framework. 4-zone 정의 (bedrock·hearth·desk·madang)
 - [`jun0-ds/sonmat`](https://github.com/jun0-ds/sonmat) — 손맛, thinking discipline (kernel 측)
+- [`bedrock/galmuri/`](../galmuri/README.md) — 갈무리, 저장(write·consolidation) 규율. 더듬이가 인출(read)이면 갈무리는 저장(write)으로, 둘이 substrate의 memory I/O 한 쌍. 변경 축이 같아 결국 이 리포가 write 쪽까지 품을 방향
 - [`jun0-ds/bobusang`](https://github.com/jun0-ds/bobusang) — 보부상, 디바이스 싱크 (운영 도구)
 
 ## License
