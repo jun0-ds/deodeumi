@@ -63,9 +63,9 @@ user-invocable: true
 
 ## 자제선 (deflationary)
 
-1. **도구 추가 안 함** — embedding·BM25·graph index는 통증 누적 *후* 결정. 본 SKILL은 *규율 명시*이지 *인덱스 빌드*가 아님
+1. **도구 추가 안 함** — embedding·BM25·graph index는 **grep 실패(누락·오탐)가 두 번 이상 재현될 때** 결정. 본 SKILL은 *규율 명시*이지 *인덱스 빌드*가 아님
 2. **사이클 자동화 안 함** — agent가 단계마다 *판단*하는 자리. 자동 retrieval pipeline X
-3. **정확도 metric 명시 측정 안 함** — Letta blog 결: "메모리는 *도구를 잘 쓰는 능력*". 측정 강박이 정확도 자체보다 큰 자리 — 통증 *인지*가 메트릭
+3. **별도 metric 파이프라인 안 지음** — Letta blog 결: "메모리는 *도구를 잘 쓰는 능력*". 단 **측정 자체를 금지하는 게 아니다**: 사이클 길이(재구성 횟수)는 그 자리에서 세면 되므로 인프라가 필요 없다. **cycle 횟수 카운트가 stale 신호** (인지가 아니라 카운트)
 
 ---
 

@@ -16,7 +16,7 @@
 
 ## 자리만, 구현은 아직 (v0.x TBD)
 
-이 리포는 *함수 자리의 정의*만 둔다. 구현은 *통증이 누적된 후* 명세한다 (deflationary).
+이 리포는 *함수 자리의 정의*만 둔다. 구현 판단은 **통증 항목과 neatness 항목을 나열해 개수로 비교한 결과**로 한다 — 나열 없는 판정은 무효 (deflationary. 절차: `hearth/vocabulary.md`).
 
 ### SKILL — 방법론 자리
 
@@ -28,7 +28,7 @@
 
 - 정형 인덱스 강화 — frontmatter·인덱스·cross-link `[[name]]`
 - 반정형 thread/heading 표준화
-- hybrid index (BM25 + semantic + RRF; semble_rs 결) — *통증 누적 전 도구화 금지*
+- hybrid index (BM25 + semantic + RRF; semble_rs 결) — **grep 실패(누락·오탐)가 두 번 이상 재현되기 전엔 도구화 X** (도구 사다리 진입 기준)
 - graph traversal (ADR supersedes·`[[name]]` lineage)
 
 ## 채택 (instance 측 사연)
