@@ -1,115 +1,129 @@
 ---
 name: requery
-description: Agentic retrieval cycle — 원래 질문이 한 번에 hit 안 되면 변환·시점·결을 바꿔 재질문하는 protocol. substrate 내부 정형/반정형/비정형 자료를 가로지른다. Letta filesystem 결(LoCoMo 74% > Mem0 graph 68.5%)의 적용. 도구가 아닌 규율.
+description: Agentic retrieval cycle — 첫 검색에서 답을 못 찾으면 표현·시점·관점을 바꿔 다시 검색하는 규율. 작업 기반의 정형·반정형·비정형 자료를 함께 찾는다. Letta filesystem 사례(LoCoMo 74% > Mem0 graph 68.5%)를 참고하며 별도 도구를 추가하지 않는다.
 user-invocable: true
 ---
 
 # Requery — Agentic Retrieval Cycle
 
-`requery`는 *반복 쿼리 재구성*. 원래 질문 한 번으로 답을 못 찾았을 때 *질문을 변환해 다시 검색*하는 protocol. 도구 추가가 아닌 **규율 명시**다.
+`requery`는 첫 질문으로 답을 찾지 못했을 때 표현·시점·관점을 바꿔 다시 검색하는 규율이다.
+검색어를 반복해서 재구성하는 방법을 정하며 별도 도구를 추가하지 않는다.
 
-근거: Letta blog *Is a Filesystem All You Need?* (LoCoMo QA) — filesystem 기반 단순 도구(grep + search_files) + agent 자율성이 graph 기반(Mem0) 68.5%를 74%로 능가. **정확도의 핵심은 retrieval 메커니즘 정교화가 아닌 *반복 쿼리 재구성*.**
+참고한 사례는 Letta 블로그의 *Is a Filesystem All You Need?*다. 이 글의 LoCoMo 질의응답 실험에서는
+파일 시스템의 단순 도구(grep·search_files)를 에이전트가 자율적으로 쓴 구성이 74%를 기록해,
+그래프 기반 Mem0의 68.5%보다 높았다. 여기서 차용하는 것은 검색 장치를 먼저 복잡하게 만들기보다
+질문을 바꿔 다시 찾는 방법이다.
 
 ---
 
 ## 발동 시점
 
-다음 신호가 잡힐 때:
+다음 신호가 잡히면 적용한다.
 
-1. **첫 질문 hit miss** — 인덱스·헤더·grep 한 번에 못 잡음
-2. **carry forward 누락 의심** — bridge-note·agenda에 "그거 어디 박았지" 발생
-3. **stale 의심** — 이름·경로·framing이 *변했을 수 있는* 정보
-4. **추상↔구체 갭** — 사용자가 추상으로 요청 / 본문은 구체 표현 (또는 역)
+1. **첫 검색 실패** — 인덱스·헤더·grep을 한 번 확인했지만 답을 찾지 못했다.
+2. **인계 누락 의심** — bridge-note·agenda에서 이전 내용을 찾지 못해 "그 내용을 어디에 남겼지?"라는 의문이 생겼다.
+3. **정보 변경 의심** — 이름·경로·설명 방식이 바뀌었을 수 있다.
+4. **표현 수준의 차이** — 사용자는 추상적으로 묻고 본문에는 구체적인 항목이 적혀 있거나 그 반대다.
 
-발동 *안 하는* 자리: 첫 질문 hit이면 즉시 종료. 사이클 강제 X.
+첫 검색에서 답을 찾았으면 즉시 끝낸다. 반복 검색을 강제하지 않는다.
 
 ---
 
-## 3-tier 데이터 결과 retrieval 결
+## 자료 유형별 검색
 
-| tier | 예시 | 1차 메커니즘 |
+| 자료 유형 | 예시 | 첫 검색 방법 |
 |------|------|------------|
-| 정형 | MEMORY·인덱스, frontmatter, ADR supersedes, agenda 체크박스 | grep + index Read |
-| 반정형 | thread 헤더(`## ⎯ ...⎯`), devlog 파일명(`{date}_{slug}.md`), journal 헤더(`## YYYY-MM-DD [hostname]`) | head/grep + 본문 Read |
-| 비정형 | journal body, notes inbox, scribe bridge-note body, devlog narrative | `rg` + 반복 쿼리 재구성 |
+| 정형 | MEMORY·인덱스, frontmatter, ADR의 supersedes, agenda 체크박스 | grep과 인덱스 읽기 |
+| 반정형 | 대화 헤더(`## ⎯ ...⎯`), devlog 파일명(`{date}_{slug}.md`), journal 헤더(`## YYYY-MM-DD [hostname]`) | head·grep과 본문 읽기 |
+| 비정형 | journal 본문, notes 수신함, scribe의 bridge-note 본문, devlog 서술 | `rg`와 검색어 재구성 |
 
-정형이 정합도 높으면 *cycle 한 번에 종료*. 반정형으로 떨어지면 cycle 한두 번. 비정형은 사이클 여러 번 자연.
+정형 자료에서 질문에 맞는 답을 찾으면 한 차례로 끝난다. 반정형 자료는 한두 차례 더 찾아야 할 수 있고,
+비정형 자료에서는 검색어를 여러 번 바꾸기도 한다.
 
 ---
 
 ## 6단계 protocol
 
 ```
-1. 질문 받음 (사용자 / self-surface)
-2. 정형 hit 시도 — MEMORY → domain → ADR supersedes
-3. miss → 반정형 — bridge-note thread 헤더, devlog 날짜, journal 헤더
-4. miss → 비정형 — rg + 본문 Read
-5. 여전히 miss → 질문 재구성 → 2부터 다시 (휴리스틱 4종 적용)
-6. n번 사이클 후 miss → external surface — 사용자에게 명시
+1. 사용자 질문이나 작업 중 생긴 질문을 확인한다.
+2. 정형 자료를 찾는다 — MEMORY → 분야 안내가 있으면 경유 → domain → ADR의 supersedes 관계
+3. 못 찾으면 반정형 자료를 찾는다 — bridge-note 대화 헤더, devlog 날짜, journal 헤더
+4. 못 찾으면 비정형 자료를 찾는다 — rg 검색과 본문 읽기
+5. 여전히 못 찾으면 질문을 재구성하고 2단계부터 다시 찾는다 — 아래 네 방법을 적용한다.
+6. 반복해도 못 찾으면 검색한 범위와 남은 불확실성을 사용자에게 알린다.
 ```
 
-### 단계 5의 휴리스틱 4종
+분야 안내를 두지 않은 instance에서는 MEMORY에서 domain으로 바로 간다. 이 절차 때문에 새 라우터를
+만들 필요는 없다.
 
-| 휴리스틱 | 적용 자리 | 예시 |
+### 질문을 바꾸는 네 방법
+
+| 방법 | 적용할 상황 | 예시 |
 |---------|---------|------|
-| **동의어** | 이름·호칭 stale | "준선생" → "류선생" / "언선생" → "김이박" |
-| **시점 변경** | 날짜·thread 분기 | "5/14 작업" → "다섯 번째 thread" / "어제" → "전 세션 carry forward" |
+| **동의어** | 이름·호칭이 바뀌었을 때 | "준선생" → "류선생" / "언선생" → "김이박" |
+| **시점 변경** | 날짜나 대화 묶음이 다를 때 | "5/14 작업" → "다섯 번째 대화" / "어제" → "전 세션 인계" |
 | **추상↔구체** | 라벨 vs 항목 | "agenda" → "[ ] 더듬이 v0.x 첫 단위" |
-| **결 변경** | 정책·구현·운영 | "더듬이 정의" → "load-bearing function" → "retrieval cycle" |
+| **관점 변경** | 정책·구현·운영 중 다른 관점이 필요할 때 | "더듬이 정의" → "load-bearing function" → "retrieval cycle" |
 
-각 휴리스틱은 *질문을 다른 표현으로 변환*해 매칭 재시도. 사이클 횟수 명시 limit 없음 — 통증 인지 시 cycle 길이를 stale 신호로 사용.
+각 방법으로 질문의 표현을 바꿔 다시 검색한다. 반복 횟수에 고정 상한은 두지 않는다. 찾는 데 드는
+비용이 문제가 되면 검색어를 바꾼 횟수를 세어 정보나 탐색 경로가 낡았는지 살핀다.
 
 ---
 
 ## 자제선 (deflationary)
 
-1. **도구 추가 안 함** — embedding·BM25·graph index는 **grep 실패(누락·오탐)가 두 번 이상 재현될 때** 결정. 본 SKILL은 *규율 명시*이지 *인덱스 빌드*가 아님
-2. **사이클 자동화 안 함** — agent가 단계마다 *판단*하는 자리. 자동 retrieval pipeline X
-3. **별도 metric 파이프라인 안 지음** — Letta blog 결: "메모리는 *도구를 잘 쓰는 능력*". 단 **측정 자체를 금지하는 게 아니다**: 사이클 길이(재구성 횟수)는 그 자리에서 세면 되므로 인프라가 필요 없다. **cycle 횟수 카운트가 stale 신호** (인지가 아니라 카운트)
+1. **도구 추가** — embedding·BM25·그래프 인덱스의 도입 여부는 grep의 누락·오탐이 두 번 이상 재현될 때 판단한다. 이 스킬은 검색 규율만 정하며 인덱스를 만들지 않는다.
+2. **반복 자동화** — 단계마다 에이전트가 판단하므로 검색 전체를 자동 파이프라인으로 바꾸지 않는다.
+3. **별도 측정 파이프라인** — Letta 사례에서 차용한 관점은 도구를 잘 쓰는 능력에 있다. 측정 자체를 금지하지는 않는다. 검색어를 재구성한 횟수는 그 자리에서 셀 수 있으므로 별도 인프라를 만들지 않는다. 오래된 정보의 신호로 쓸 때도 막연한 느낌 대신 이 횟수를 센다.
 
 ---
 
-## 손맛 vs 더듬이 경계
+## 손맛과 더듬이의 경계
 
 | 측면 | 손맛 (sonmat) | 더듬이 (deodeumi) |
 |------|--------------|-----------------|
-| 결 | thinking discipline | retrieval discipline |
+| 규율 | thinking discipline | retrieval discipline |
 | 대상 | 사고 흐름·검증·기록 | 정보 도달·원본 추적 |
-| 발동 | System 1 신호 (inspect), 결정 직전 (devil), 마무리 (punch) | 질문 hit miss, carry forward 누락, stale 의심 |
+| 발동 | System 1 신호 (inspect), 결정 직전 (devil), 마무리 (punch) | 첫 검색 실패, 인계 누락, 정보 변경 의심 |
 | SKILL 예 | `devil`·`inspect`·`punch`·`autoloop`·`scribe`·`guard` | `requery` (첫 SKILL) |
 
-두 컴포넌트는 *별도 자리*. 결합 시: 손맛이 *답이 맞는지 검증* / 더듬이가 *답에 도달하는 경로 추적*.
+두 컴포넌트의 역할은 다르다. 함께 쓸 때 손맛은 답이 맞는지 검증하고 더듬이는 답에 이르는 경로를 추적한다.
 
 ---
 
-## 예시 (시연 — 안채 instance 패턴)
+## 안채 적용 예시
 
 **질문**: "더듬이 5/14에 뭐 결정했지?"
 
 ```
-1. 정형 hit — desk/memory/MEMORY.md 인덱스에서 "더듬이" grep
-   → domain/deodeumi.md 발견. 정의 가설 1차 박힘 + public 추출 결정 확인
-2. (필요 시) 반정형 — bridge-note 5/14 thread "여섯 번째" head 5줄
-3. (사이클 종료) 정형 hit 충분
+1. 정형 — desk/memory/MEMORY.md에서 "더듬이"에 해당하는 분야 안내를 찾는다.
+   → routes/ai-tools.md → domain/deodeumi.md 순으로 읽는다.
+   → 정의 가설과 공개 추출 결정의 기록을 확인한다.
+2. 필요하면 반정형 — bridge-note의 5/14 "여섯 번째" 대화 헤더 아래 다섯 줄을 읽는다.
+3. 정형 자료만으로 답이 충분하면 끝낸다.
 
-총 cycle = 1 (정형). 종료.
+정형 자료에서 답을 찾은 경우 검색은 한 차례로 끝난다.
 ```
 
-**질문**: "더듬이 함수 정의가 *원래 어떻게* 박혀 있었지?"
+**질문**: "더듬이 함수 정의를 원래 어떻게 적었지?"
 
 ```
-1. 정형 — domain/deodeumi.md 인덱스에 hit. 단 *original* 정의는 *현재 박힘 정의* 아님
-2. 휴리스틱 시점 변경 → "원래 / 부트스트랩 / 5/7" 재질문
-3. devlog 2026-05-07_experiment-and-bootstrap.md head — 원본 framing 발견
-4. (또는) bedrock/deodeumi 리포 git log — initial commit 시점 본문
+1. 정형 — MEMORY.md → routes/ai-tools.md → domain/deodeumi.md 순으로 읽는다.
+   현재 정의가 최초 정의를 설명하는지는 따로 확인한다.
+2. 시점을 바꿔 "원래 / 부트스트랩 / 5/7"로 다시 검색한다.
+3. devlog 2026-05-07_experiment-and-bootstrap.md 앞부분에서 당시 설명을 찾는다.
+4. 또는 bedrock/deodeumi 리포의 git log에서 최초 커밋의 본문을 읽는다.
 
-총 cycle = 2~3 (시점 휴리스틱). 종료.
+시점을 바꾸며 두세 차례 검색한 뒤 끝낸다.
 ```
 
 ---
 
-## 채택 (instance 측)
+## instance에 적용하기
 
-이 SKILL은 *함수 자리*의 첫 본문. 채택하는 instance는 자기 substrate 구조(memory 경로·devlog cadence·bridge-note thread 형식)에 맞춰 *3-tier 매핑*과 *6단계 protocol*을 자기 결로 변형한다.
+이 스킬은 검색을 반복하는 방법을 처음 정리한 문서다. 채택하는 instance는 자신의 작업 기반에 맞춰
+세 자료 유형의 매핑과 여섯 단계 절차를 조정한다. memory 경로, devlog 기록 주기, bridge-note 대화
+헤더의 형식이 조정 대상이다.
 
-레퍼런스 instance: `jun0-ds/munteok-anchae` (private) — `desk/memory/domain/deodeumi.md`에 우리 적용 사연·외부 reference 1차 fact·통증 측정 자리 거주.
+참고 instance는 비공개 리포 `jun0-ds/munteok-anchae`다. 적용 경위, 외부 자료에서 확인한 사실,
+탐색 비용을 측정하는 방법은 `desk/memory/domain/deodeumi.md`에 둔다.
