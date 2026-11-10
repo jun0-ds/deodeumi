@@ -114,7 +114,7 @@ user-invocable: true
 3. devlog 2026-05-07_experiment-and-bootstrap.md 앞부분에서 당시 설명을 찾는다.
 4. 또는 bedrock/deodeumi 리포의 git log에서 최초 커밋의 본문을 읽는다.
 
-시점을 바꾸며 두세 차례 검색한 뒤 끝낸다.
+이 예시에서는 시점을 바꿔 최초 정의를 찾았고 검색은 두세 차례로 끝났다.
 ```
 
 ---
