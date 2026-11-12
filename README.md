@@ -1,5 +1,7 @@
 # deodeumi (더듬이) — substrate retrieval + path orchestration 함수의 자리
 
+> **보관 (2026-11-12)** — `requery` 스킬은 [손맛(sonmat)](https://github.com/jun0-ds/sonmat) v0.24.0의 `skills/requery/`로 옮겼다. 이 저장소는 읽기 전용으로 보관하며 새 변경은 손맛에서 한다. 근거는 손맛 ADR `docs/decisions/2026-11-12-absorb-deodeumi-requery.md`.
+
 문턱(munteok) 시스템에서 *어떤 정보가 어디 있는지 더듬어 도달하고 · 무엇을 할지 · 어떤 순서로 · 언제 에스컬레이트할지* — 세션을 가로지르는 **substrate-내부 retrieval + 경로찾기 함수**가 사는 자리.
 
 3-layer로 보면: kernel(`bedrock/sonmat/` — 어떻게 생각) / data(`hearth/` + `desk/` — 정체성·메모리·작업) / **management(deodeumi — 정보 도달 + 어디로 갈지 더듬기)**. 이름 = 곤충의 더듬이. 중앙 설계자 없이 환경을 *더듬어* 길을 찾는 기관.

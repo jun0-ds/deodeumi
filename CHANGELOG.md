@@ -10,6 +10,9 @@ All notable changes to deodeumi. Format loosely follows [Keep a Changelog](https
 
 ## [Unreleased]
 
+### Archived (2026-11-12)
+- `skills/requery/SKILL.md`를 손맛(`jun0-ds/sonmat`) v0.24.0으로 옮기고 이 저장소를 보관한다. 이후 변경은 손맛에서 한다.
+
 _(다음 변경 누적)_
 
 ## [0.1.0] - 2026-05-26
